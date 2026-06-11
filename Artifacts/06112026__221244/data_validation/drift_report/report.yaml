@@ -1,0 +1,93 @@
+Abnormal_URL:
+  drift_status: false
+  p_value: 1.0
+DNSRecord:
+  drift_status: false
+  p_value: 1.0
+Domain_registeration_length:
+  drift_status: false
+  p_value: 1.0
+Favicon:
+  drift_status: false
+  p_value: 0.9999510909578456
+Google_Index:
+  drift_status: false
+  p_value: 0.8427303427983684
+HTTPS_token:
+  drift_status: false
+  p_value: 0.9999999883158472
+Iframe:
+  drift_status: false
+  p_value: 0.9890321623362285
+Links_in_tags:
+  drift_status: false
+  p_value: 1.0
+Links_pointing_to_page:
+  drift_status: false
+  p_value: 0.9597114153770513
+Page_Rank:
+  drift_status: false
+  p_value: 0.653006152591551
+Prefix_Suffix:
+  drift_status: false
+  p_value: 0.9964705532516113
+Redirect:
+  drift_status: false
+  p_value: 1.0
+Request_URL:
+  drift_status: false
+  p_value: 0.4179095372542621
+Result:
+  drift_status: false
+  p_value: 0.25890094688148774
+RightClick:
+  drift_status: false
+  p_value: 1.0
+SFH:
+  drift_status: false
+  p_value: 0.9999760319468036
+SSLfinal_State:
+  drift_status: false
+  p_value: 0.9086653866244705
+Shortining_Service:
+  drift_status: false
+  p_value: 0.9876237011526984
+Statistical_report:
+  drift_status: false
+  p_value: 1.0
+Submitting_to_email:
+  drift_status: false
+  p_value: 0.9739932435377546
+URL_Length:
+  drift_status: false
+  p_value: 1.0
+URL_of_Anchor:
+  drift_status: false
+  p_value: 0.6209491851767668
+age_of_domain:
+  drift_status: false
+  p_value: 0.9999999999876384
+double_slash_redirecting:
+  drift_status: false
+  p_value: 0.9999999999999952
+having_At_Symbol:
+  drift_status: false
+  p_value: 0.5654537636267017
+having_IP_Address:
+  drift_status: false
+  p_value: 0.9528546927737338
+having_Sub_Domain:
+  drift_status: false
+  p_value: 0.9999993831997822
+on_mouseover:
+  drift_status: false
+  p_value: 0.9995152509457711
+popUpWidnow:
+  drift_status: false
+  p_value: 0.9990438890770315
+port:
+  drift_status: false
+  p_value: 0.9943908690886974
+web_traffic:
+  drift_status: false
+  p_value: 0.5970291509297161
