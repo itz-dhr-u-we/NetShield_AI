@@ -31,10 +31,15 @@ os.environ["MLFLOW_TRACKING_URI"]=os.getenv("MLFLOW_TRACKING_URI")
 os.environ["MLFLOW_TRACKING_USERNAME"]=os.getenv("MLFLOW_TRACKING_USERNAME")
 os.environ["MLFLOW_TRACKING_PASSWORD"]=os.getenv("MLFLOW_TRACKING_PASSWORD")
 
-import dagshub
-dagshub.init(repo_owner='itz-dhr-u-we', repo_name='networksecurity', mlflow=True)
 
+def setup_mlflow():
+    import dagshub
 
+    dagshub.init(
+        repo_owner='itz-dhr-u-we',
+        repo_name='networksecurity',
+        mlflow=True
+    )
 
 class ModelTrainer:
     def __init__(self,model_trainer_config:ModelTrainerConfig,data_transformation_artifact:DataTransformationArtifact):
@@ -46,6 +51,8 @@ class ModelTrainer:
         
     def track_mlflow(self,best_model,classification_train_metric,
                     classification_test_metric):
+        setup_mlflow()
+        
         mlflow.set_registry_uri(
             "https://dagshub.com/itz-dhr-u-we/networksecurity.mlflow"
             )

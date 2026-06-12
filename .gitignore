@@ -1,4 +1,5 @@
 venv
 .env
+.venv
 testenv
 test_mongodb.py
