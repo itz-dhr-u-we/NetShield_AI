@@ -7,4 +7,6 @@ pymongo==4.17.0
 scikit-learn
 dill
 pyaml
+mlflow
+dagshub
 ##-e . 
