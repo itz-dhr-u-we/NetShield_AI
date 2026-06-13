@@ -78,8 +78,11 @@ async def predict_route(request: Request, file: UploadFile = File(...)):
     try:
         df = pd.read_csv(file.file)
 
-        preprocessor = load_object("final_model/preprocessor.pkl")
-        final_model = load_object("final_model/model.pkl")
+        preprocessor_path = "final_model/preprocessor.pkl"
+        model_path = "final_model/model.pkl"
+
+        preprocessor = load_object(preprocessor_path)
+        final_model = load_object(model_path)
 
         network_model = NetworkModel(
             preprocessor=preprocessor,
@@ -89,7 +92,8 @@ async def predict_route(request: Request, file: UploadFile = File(...)):
         y_pred = network_model.predict(df)
 
         df["predicted_column"] = y_pred
-
+        if not os.path.exists("final_model/model.pkl"):
+            return {"error": "Model not trained. Call /train first"}
         os.makedirs("prediction_output", exist_ok=True)
         df.to_csv("prediction_output/output.csv", index=False)
 

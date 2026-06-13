@@ -183,16 +183,24 @@ class ModelTrainer:
             model_trainer_artifact
         )
 
+        
+        os.makedirs("final_model", exist_ok=True)
+
+        # save preprocessor used in training
+        save_object(
+            file_path="final_model/preprocessor.pkl",
+            obj=preprocessor
+        )
+
+        # save trained model separately
+        save_object(
+            file_path="final_model/model.pkl",
+            obj=best_model
+        )
+
         return model_trainer_artifact
 
 
-
-        
-
-
-       
-    
-    
         
     def initiate_model_trainer(self)->ModelTrainerArtifact:
         try:
