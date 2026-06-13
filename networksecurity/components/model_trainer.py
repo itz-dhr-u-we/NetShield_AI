@@ -38,13 +38,6 @@ def setup_mlflow():
     if os.getenv("MLFLOW_TRACKING_PASSWORD"):
         os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
-    import dagshub
-    dagshub.init(
-        repo_owner="itz-dhr-u-we",
-        repo_name="networksecurity",
-        mlflow=True,
-    )
-
 
 class ModelTrainer:
     def __init__(
