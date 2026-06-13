@@ -113,16 +113,13 @@ async def predict_route(request: Request, file: UploadFile = File(...)):
         os.makedirs("prediction_output", exist_ok=True)
         df.to_csv("prediction_output/output.csv", index=False)
 
-        # Convert dataframe to HTML table safely
         table_html = df.to_html(classes="table table-striped")
 
-        # FIX: Explicit context dictionary formatting for Jinja2 template response
+        # UNIVERSAL FIX: Pass 'request' explicitly as the absolute first argument
         return templates.TemplateResponse(
-            name="table.html",
-            context={
-                "request": request, 
-                "table": table_html
-            }
+            request, 
+            "table.html", 
+            {"request": request, "table": table_html}
         )
 
     except Exception as e:
