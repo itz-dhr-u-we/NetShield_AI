@@ -16,3 +16,5 @@ logs/
 mlruns/
 mlflow.db
 .DS_Store
+Dockerfile
+.github/
