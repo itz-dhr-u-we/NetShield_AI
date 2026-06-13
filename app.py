@@ -80,10 +80,18 @@ async def train_route():
 @app.post("/predict")
 async def predict_route(request: Request, file: UploadFile = File(...)):
     try:
-        df = pd.read_csv(file.file)
+        # Read file safely via memory buffer to avoid stream reading issues
+        contents = await file.read()
+        df = pd.read_csv(pd.io.common.BytesIO(contents))
+
+        # Reset the stream just in case anything else needs it
+        await file.seek(0)
 
         preprocessor_path = "final_model/preprocessor.pkl"
         model_path = "final_model/model.pkl"
+
+        if not os.path.exists(model_path):
+            return {"error": "Model not trained. Call /train first"}
 
         preprocessor = load_object(preprocessor_path)
         final_model = load_object(model_path)
@@ -93,31 +101,42 @@ async def predict_route(request: Request, file: UploadFile = File(...)):
             model=final_model
         )
 
+        # Ensure the dataframe columns exactly match what the preprocessor expects
+        # (Drop any accidental empty index columns or formatting artifacts)
+        if "Unnamed: 0" in df.columns:
+            df = df.drop(columns=["Unnamed: 0"])
+
         y_pred = network_model.predict(df)
 
         df["predicted_column"] = y_pred
-        if not os.path.exists("final_model/model.pkl"):
-            return {"error": "Model not trained. Call /train first"}
+        
         os.makedirs("prediction_output", exist_ok=True)
         df.to_csv("prediction_output/output.csv", index=False)
 
+        # Convert dataframe to HTML table safely
         table_html = df.to_html(classes="table table-striped")
 
+        # FIX: Explicit context dictionary formatting for Jinja2 template response
+        context = {
+            "request": request,
+            "table": table_html
+        }
+
         return templates.TemplateResponse(
-            "table.html",
-            {
-                "request": request,
-                "table": table_html
-            }
+            name="table.html",
+            context=context
         )
 
     except Exception as e:
-        logging.error(str(e))
+        logging.error(f"Prediction failed: {str(e)}")
+        # This will send the exact traceback details to your Render logs for visibility
+        import traceback
+        traceback.print_exc() 
         return Response(
             content=f"Internal Server Error: {str(e)}",
             status_code=500
         )
-
+        
 @app.get("/metrics")
 def get_metrics():
     try:
