@@ -14,6 +14,7 @@ from networksecurity.entity.config_entity import (
     DataValidationConfig,
     DataTransformationConfig,
     ModelTrainerConfig,
+    TrainingPipelineConfig
 )
 
 from networksecurity.entity.artifact_entity import (
@@ -21,6 +22,7 @@ from networksecurity.entity.artifact_entity import (
     DataValidationArtifact,
     DataTransformationArtifact,
     ModelTrainerArtifact,
+    ClassificationMetricArtifact
 )
 
 
