@@ -28,16 +28,23 @@ class DataIngestion:
 
     def export_collection_as_dataframe(self):
         try:
+            logging.info("Connecting to MongoDB")
+
             database_name = self.data_ingestion_config.database_name
             collection_name = self.data_ingestion_config.collection_name
-            self.mongo_client = pymongo.MongoClient(MONGODB_URL)
-            collection = self.mongo_client[database_name][collection_name]
+    
+            client = pymongo.MongoClient(MONGODB_URL)
+            collection = client[database_name][collection_name]
+    
             df = pd.DataFrame(list(collection.find()))
-            if "_id" in df.columns.to_list():
-                df= df.drop(columns=["_id"], errors="ignore")
-            if "id" in df.columns:
-                df = df.drop(columns=["id"],errors="ignore")
-            df.replace({"na":np.nan},inplace= True)
+            client.close()
+    
+            logging.info("MongoDB data fetched successfully")
+    
+            df.drop(columns=["_id", "id"], errors="ignore", inplace=True)
+    
+            df.replace(["na", "NA", "NaN", "null", ""], np.nan, inplace=True)
+    
             return df
         except Exception as e:
             raise NetworkSecurityException(e,sys)
@@ -52,7 +59,7 @@ class DataIngestion:
         except Exception as e:
             raise NetworkSecurityException(e,sys)
 
-    def split_data_as_train_test(self,dataframe:pd.DataFrame):
+    def split_data_as_train_test(self,dataframe:pd.DataFrame)->None:
         try:
             train_set,test_set = train_test_split(
                 dataframe,test_size=self.data_ingestion_config.train_test_split_ratio

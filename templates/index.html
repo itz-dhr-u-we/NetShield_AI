@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NetShield AI Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 30px;
+            background: #f4f6f9;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .metrics {
+            display: flex;
+            gap: 20px;
+        }
+
+        .metric-box {
+            flex: 1;
+            padding: 15px;
+            background: #e8f0fe;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .loader {
+            display: none;
+            color: blue;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- 1. UPLOAD -->
+<div class="card">
+    <h2>📁 Upload CSV for Prediction</h2>
+    <input type="file" id="fileInput" />
+    <button onclick="uploadFile()">Predict</button>
+    <div id="loader" class="loader">Processing prediction...</div>
+</div>
+
+<!-- 2. PREDICTION OUTPUT -->
+<div class="card">
+    <h2>  Prediction Output</h2>
+    <div id="resultTable">No prediction yet</div>
+</div>
+
+<!-- 3. METRICS -->
+<div class="card">
+    <h2>📊 Model Metrics</h2>
+    <button onclick="loadMetrics()">Load Metrics</button>
+    <div class="metrics" id="metricsBox">Click to load metrics</div>
+</div>
+
+<script>
+
+async function loadMetrics() {
+    try {
+        const res = await fetch("/metrics");
+        const data = await res.json();
+
+        document.getElementById("metricsBox").innerHTML = `
+            <div class="metric-box">Train F1<br><h3>${data.train_f1}</h3></div>
+            <div class="metric-box">Test F1<br><h3>${data.test_f1}</h3></div>
+            <div class="metric-box">Train Precision<br><h3>${data.train_precision}</h3></div>
+            <div class="metric-box">Test Precision<br><h3>${data.test_precision}</h3></div>
+        `;
+    } catch (err) {
+        document.getElementById("metricsBox").innerHTML =
+            "<p style='color:red'>Metrics not available</p>";
+    }
+}
+
+async function uploadFile() {
+
+    let fileInput = document.getElementById("fileInput");
+
+    if (!fileInput.files.length) {
+        alert("Please select a file first");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    document.getElementById("loader").style.display = "block";
+
+    try {
+        const res = await fetch("/predict", {
+            method: "POST",
+            body: formData
+        });
+
+        const html = await res.text();
+
+        document.getElementById("resultTable").innerHTML = html;
+
+    } catch (err) {
+        document.getElementById("resultTable").innerHTML =
+            "<p style='color:red;'>Prediction failed</p>";
+    }
+
+    document.getElementById("loader").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>

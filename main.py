@@ -6,11 +6,18 @@ from networksecurity.entity.config_entity import TrainingPipelineConfig
 from networksecurity.components.data_validation import DataValidation
 from networksecurity.components.data_transformation import DataTransformation
 
-
+from networksecurity.utils.main_utils.utils import (
+    load_numpy_array_data,
+    evaluate_models,
+    save_object
+)
 from networksecurity.components.model_trainer import ModelTrainer
 from networksecurity.entity.config_entity import ModelTrainerConfig
 import sys
 
+import os
+
+os.makedirs("artifact", exist_ok=True)
 
 if __name__ == "__main__":
     try:
@@ -38,7 +45,12 @@ if __name__ == "__main__":
         logging.info("Model Training started")
         model_trainer_config = ModelTrainerConfig(trainingpipelineconfig)
         model_trainer=ModelTrainer(model_trainer_config=model_trainer_config,data_transformation_artifact=data_transformation_artifact)
-        model_trainer_artifact= model_trainer.initiate_model_trainer()
+        
+        model_trainer_artifact = model_trainer.initiate_model_trainer()
+        save_object(
+            "artifact/model_trainer_artifact.pkl",
+            model_trainer_artifact
+        )
         logging.info("Model Training artifact created")
 
 

@@ -36,15 +36,23 @@ def save_numpy_array_data(file_path: str,array: np.array):
     except Exception as e:
         raise NetworkSecurityException(e,sys)
 
-def save_object(file_path:str,obj:object)-> None:
+def save_object(file_path: str, obj: object) -> None:
     try:
-        logging.info("Entered the save object method of main utils class")
-        os.makedirs(os.path.dirname(file_path),exist_ok=True)
-        with open(file_path,"wb") as file_obj:
-            pickle.dump(obj,file_obj)
-        logging.info("Exited the save_object methos of MainUtils class")
+        logging.info("Entered save_object method")
+
+        dir_path = os.path.dirname(file_path)
+
+        # SAFETY CHECK (THIS FIXES YOUR ISSUE)
+        if dir_path != "":
+            os.makedirs(dir_path, exist_ok=True)
+
+        with open(file_path, "wb") as file_obj:
+            pickle.dump(obj, file_obj)
+
+        logging.info("Exited save_object method")
+
     except Exception as e:
-        raise NetworkSecurityException(e,sys)
+        raise NetworkSecurityException(e, sys)
 
 def load_object(file_path: str, ) -> object:
     try:

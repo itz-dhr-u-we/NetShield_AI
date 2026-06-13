@@ -27,12 +27,18 @@ from dotenv import load_dotenv
 load_dotenv()
 import mlflow
 from urllib.parse import urlparse
-os.environ["MLFLOW_TRACKING_URI"]=os.getenv("MLFLOW_TRACKING_URI")
-os.environ["MLFLOW_TRACKING_USERNAME"]=os.getenv("MLFLOW_TRACKING_USERNAME")
-os.environ["MLFLOW_TRACKING_PASSWORD"]=os.getenv("MLFLOW_TRACKING_PASSWORD")
+
 
 
 def setup_mlflow():
+    if os.getenv("MLFLOW_TRACKING_URI"):
+        os.environ["MLFLOW_TRACKING_URI"] = os.getenv("MLFLOW_TRACKING_URI")
+
+    if os.getenv("MLFLOW_TRACKING_USERNAME"):
+        os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
+
+    if os.getenv("MLFLOW_TRACKING_PASSWORD"):
+        os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
     import dagshub
 
     dagshub.init(
@@ -44,6 +50,7 @@ def setup_mlflow():
 class ModelTrainer:
     def __init__(self,model_trainer_config:ModelTrainerConfig,data_transformation_artifact:DataTransformationArtifact):
         try:
+            setup_mlflow()
             self.model_trainer_config=model_trainer_config
             self.data_transformation_artifact=data_transformation_artifact
         except Exception as e:
@@ -51,7 +58,7 @@ class ModelTrainer:
         
     def track_mlflow(self,best_model,classification_train_metric,
                     classification_test_metric):
-        setup_mlflow()
+        
         
         mlflow.set_registry_uri(
             "https://dagshub.com/itz-dhr-u-we/networksecurity.mlflow"
@@ -92,7 +99,7 @@ class ModelTrainer:
                 "Random Forest": RandomForestClassifier(verbose=1),
                 "Decision Tree": DecisionTreeClassifier(),
                 "Gradient Boosting": GradientBoostingClassifier(verbose=1),
-                "Logistic Regression": LogisticRegression(verbose=1),
+                "Logistic Regression": LogisticRegression(max_iter=1000,verbose=1),
                 "AdaBoost": AdaBoostClassifier(),
             }
         params={
@@ -136,7 +143,9 @@ class ModelTrainer:
         )
 
         best_model = models[best_model_name]
+        #best_model.fit(X_train, y_train)
         best_model_score = model_report[best_model_name]
+
         y_train_pred=best_model.predict(X_train)
 
         classification_train_metric=get_classification_score(y_true=y_train,y_pred=y_train_pred)
@@ -145,26 +154,37 @@ class ModelTrainer:
         y_test_pred=best_model.predict(x_test)
         classification_test_metric=get_classification_score(y_true=y_test,y_pred=y_test_pred)
 
-        self.track_mlflow(best_model,classification_train_metric=classification_test_metric,classification_test_metric=classification_test_metric)
+        self.track_mlflow(best_model,classification_train_metric=classification_train_metric,classification_test_metric=classification_test_metric)
 
         preprocessor = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)
             
         model_dir_path = os.path.dirname(self.model_trainer_config.trained_model_file_path)
         os.makedirs(model_dir_path,exist_ok=True)
-
+        os.makedirs("artifact", exist_ok=True)
         Network_Model=NetworkModel(preprocessor=preprocessor,model=best_model)
         save_object(self.model_trainer_config.trained_model_file_path,obj=Network_Model)
         #model pusher
-        save_object("final_model/model.pkl",best_model)
-        
+        #save_object("final_model/model.pkl",best_model)
+        #save_object("final_model/preprocessor.pkl",preprocessor)
 
         ## Model Trainer Artifact
-        model_trainer_artifact=ModelTrainerArtifact(trained_model_file_path=self.model_trainer_config.trained_model_file_path,
-                             train_metric_artifact=classification_train_metric,
-                             test_metric_artifact=classification_test_metric
-                             )
+        model_trainer_artifact = ModelTrainerArtifact(
+            trained_model_file_path=self.model_trainer_config.trained_model_file_path,
+            train_metric_artifact=classification_train_metric,
+            test_metric_artifact=classification_test_metric
+        )
+
         logging.info(f"Model trainer artifact: {model_trainer_artifact}")
+        
+        os.makedirs("artifact", exist_ok=True)
+
+        save_object(
+            "artifact/model_trainer_artifact.pkl",
+            model_trainer_artifact
+        )
+
         return model_trainer_artifact
+
 
 
         
